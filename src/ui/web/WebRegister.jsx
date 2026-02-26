@@ -23,6 +23,7 @@ const CATEGORY_DATA = {
   '컴퓨터': ['삼성노트북', 'LG노트북', '애플노트북', '기타'],
   '카드': ['신용(체크)카드', '일반카드', '교통카드', '기타카드'],
   '현금': ['현금'],
+  '유가증권': ['어음','상품권','채권','기타(유가증권)'],
   '휴대폰': ['삼성휴대폰', 'LG휴대폰', '아이폰', '기타휴대폰', '기타통신기기'],
   '기타물품': ['기타물품']
 };
@@ -74,15 +75,6 @@ const WebRegister = () => {
   // 실제 서버로 전송할 파일 객체 (File Object)
   const [realImageFile, setRealImageFile] = useState(null);
 
-  // -----------------------------------------------------------
-  // 🚨 [보안] 비로그인 상태 접근 차단 (로그인 페이지로 리다이렉트)
-  // returnUrl을 지정하여 로그인 후 다시 이 페이지로 돌아오도록 설정
-  // -----------------------------------------------------------
-  /*
-  if (!user) {
-    return <WebLogin returnUrl="/register" />;
-  }
-*/
   // -----------------------------------------------------------
   // 2. [핸들러] 입력값 변경 처리
   // -----------------------------------------------------------
@@ -253,7 +245,6 @@ const WebRegister = () => {
               <label style={{display:'block', fontWeight:'bold', marginBottom:8}}>상세 설명</label>
               <textarea name="desc" placeholder="내용 입력" value={inputs.desc} onChange={handleChange} style={{width:'100%', height: 120, padding:12, borderRadius:8, border:'1px solid #ddd', resize:'none'}} />
             </div>
-            {/* user 변수 사용 */}
             <div style={{ textAlign: 'center', marginTop: 10, fontSize: 14, color: user ? '#27ae60' : '#e74c3c' }}>
               {user ? '🎁 습득물 등록 시 포인트가 지급됩니다.' : '💡 비회원으로 등록되며, 포인트는 지급되지 않습니다.'}
             </div>
