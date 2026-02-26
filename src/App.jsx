@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-
+import axios from 'axios';
 // -----------------------------------------------------------
 // [1] 페이지 컴포넌트 불러오기
 // -----------------------------------------------------------
@@ -10,6 +10,7 @@ import WebDetail from './ui/web/WebDetail';
 import WebRegister from './ui/web/WebRegister';
 import WebMyPage from './ui/web/WebMyPage';
 import WebSignup from './ui/web/WebSignup';
+import WebTerms from './ui/web/WebTerms';
 
 // (2) 키오스크(Raspberry Pi)용 페이지
 import KioskHome from './ui/kiosk/KioskHome';
@@ -21,13 +22,42 @@ import KioskLogin from './ui/kiosk/KioskLogin';
 import KioskRecoveryList from './ui/kiosk/KioskRecoveryList';
 import KioskRetrievalLocker from './ui/kiosk/KioskRetrievalLocker';
 
+// Admin 페이지
+import AdminRequests from './ui/web/AdminRequests';
+
 // -----------------------------------------------------------
 // [2] Context (데이터 공급소) 불러오기
 // -----------------------------------------------------------
 import { ItemProvider } from './context/ItemContext'; // 분실물 데이터
 import { UserProvider } from './context/UserContext'; // 유저 로그인 정보
+import { KioskItemProvider } from './context/KioskItemContext';
+import { KioskUserProvider } from './context/KioskUserContext';
 
 import './App.css';
+
+// Axios 설정: 모든 요청 전에 실행됨
+axios.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// 토큰이 만료되어 401 에러가 나면 자동으로 로그아웃 처리
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login'; // 로그인 페이지로 튕기기
+    }
+    return Promise.reject(error);
+  }
+);
+
+
+
 
 function App() {
   return (
@@ -37,8 +67,9 @@ function App() {
     // -----------------------------------------------------------
     <UserProvider>
       <ItemProvider>
-        
-        {/* [4] 라우터 설정 (주소별 화면 연결) */}
+        <KioskUserProvider>
+          <KioskItemProvider>
+    {/* [4] 라우터 설정 (주소별 화면 연결) */}
         <BrowserRouter>
           <Routes>
             
@@ -51,6 +82,8 @@ function App() {
             <Route path="/register" element={<WebRegister />} /> {/* 등록 페이지 */}
             <Route path="/mypage" element={<WebMyPage />} />     {/* 마이 페이지 */}
             <Route path="/signup" element={<WebSignup />} />     {/* 회원가입 페이지 */}
+            <Route path="/terms/:id" element={<WebTerms />} />
+            <Route path="/admin/requests" element={<AdminRequests />} />
 
 
             {/* =======================================================
@@ -67,12 +100,13 @@ function App() {
             
             {/* --- 회수 절차 --- */}
             <Route path="/kiosk/login" element={<KioskLogin />} />       {/* 1. 로그인 */}
-            <Route path="/kiosk/recovery" element={<KioskRecoveryList />} /> {/* 2. 목록 선택 */}
+            <Route path="/kiosk/recovery-List" element={<KioskRecoveryList />} /> {/* 2. 목록 선택 */}
             <Route path="/kiosk/retrieval-locker" element={<KioskRetrievalLocker />} /> {/* 3. 회수함 열림 */}
 
           </Routes>
         </BrowserRouter>
-
+          </KioskItemProvider>
+        </KioskUserProvider>
       </ItemProvider>
    </UserProvider>
   );
