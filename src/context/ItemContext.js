@@ -37,7 +37,7 @@ export const ItemProvider = ({ children }) => {
   // 전체 분실물 목록 조회
   const fetchItems = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/items`);
+      const response = await axios.get(`${BASE_URL}/api/web/items`);
       
       const mappedList = response.data.map(dbItem => ({
         id: dbItem.item_id,
@@ -61,7 +61,7 @@ export const ItemProvider = ({ children }) => {
   // 특정 분실물 상세 조회
   const getItemDetail = async (id) => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/items/${id}`);
+      const response = await axios.get(`${BASE_URL}/api/web/items/${id}`);
       const data = response.data;
       
       return {
@@ -111,7 +111,7 @@ export const ItemProvider = ({ children }) => {
       if (token && token !== 'null') {
         headers['Authorization'] = `Bearer ${token}`;
       }
-      await axios.post(`${BASE_URL}/api/items`, formData, {
+      await axios.post(`${BASE_URL}/api/web/items`, formData, {
         headers: { 
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}` 
