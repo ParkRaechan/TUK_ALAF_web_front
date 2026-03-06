@@ -1,8 +1,9 @@
 import React, { useContext } from 'react';
 import { UserContext } from '../../context/UserContext';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, LogOut, User, ShieldCheck, Mail, Phone, Package, ClipboardList } from 'lucide-react';
+import { ArrowLeft, LogOut, User, ShieldCheck, Mail, Phone, Package, ClipboardList, Bell } from 'lucide-react';
 import WebLogin from './WebLogin';
+import AlertSettings from './AlertSettings';
 
 // 사용자 마이페이지 및 관리자 대시보드 진입점
 const WebMyPage = () => {
@@ -58,6 +59,17 @@ const WebMyPage = () => {
                 >
                     <LogOut size={18} /> 로그아웃
                 </button>
+            </div>
+            
+            {/* 2. [알림 설정] AlertSettings 컴포넌트로 분리하여 관리 */}
+            <div style={{ marginTop: 40 }}>
+                <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#333', fontSize: 18, fontWeight: 'bold', marginBottom: 15 }}>
+                    <Bell size={22} color="#fcc419" /> 이메일 키워드 알림 설정
+                </h3>
+                {/* AlertSettings 내부의 스타일이 마이페이지와 조화를 이루도록 
+                   컴포넌트를 호출합니다. 
+                */}
+                <AlertSettings />
             </div>
 
             {/* 3. [권한 분기] 로그인한 유저의 role이 'ADMIN'일 경우에만 관리자 메뉴 노출 */}
