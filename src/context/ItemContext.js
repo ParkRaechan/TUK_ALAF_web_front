@@ -129,8 +129,34 @@ export const ItemProvider = ({ children }) => {
     }
   };
 
+  const deleteItem = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      // 토큰이 없으면 컷
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        return false;
+      }
+
+      const headers = { 'Authorization': `Bearer ${token}` };
+      
+      // 삭제 API 호출 (DELETE 메서드 사용)
+      await axios.delete(`${BASE_URL}/api/items/${id}`, { headers });
+      
+      // 삭제 성공 후 목록 새로고침
+      fetchItems(); 
+      return true;
+    } catch (error) {
+      console.error("삭제 실패:", error);
+      // 백엔드에서 에러 메시지를 보내줬다면 띄워주고, 아니면 기본 메시지
+      const errorMsg = error.response?.data?.message || '삭제 권한이 없거나 오류가 발생했습니다.';
+      alert(errorMsg);
+      return false;
+    }
+  };
+
   return (
-    <ItemContext.Provider value={{ items, fetchItems, getItemDetail, addItem, BASE_URL }}>
+    <ItemContext.Provider value={{ items, fetchItems, getItemDetail, addItem, deleteItem, BASE_URL }}>
       {children}
     </ItemContext.Provider>
   );

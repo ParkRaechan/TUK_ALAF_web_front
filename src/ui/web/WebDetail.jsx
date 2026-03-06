@@ -8,7 +8,7 @@ import axios from 'axios';
 // 분실물 상세 정보 확인 및 소유권(회수) 주장 페이지
 const WebDetail = () => {
   const { id } = useParams();
-  const { getItemDetail } = useContext(ItemContext);
+  const { getItemDetail, deleteItem } = useContext(ItemContext);
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
   
@@ -53,6 +53,19 @@ const WebDetail = () => {
       window.location.reload(); 
     } catch (error) {
       alert(error.response?.data?.message || '신청 실패');
+    }
+  };
+
+  
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm("정말 이 분실물을 삭제하시겠습니까?\n(삭제 후 복구할 수 없습니다.)");
+    if (confirmDelete) {
+      const isSuccess = await deleteItem(id);
+      if (isSuccess) {
+        alert("성공적으로 삭제되었습니다.");
+        // 삭제 후 목록 페이지로 강제 이동 (주소는 프로젝트 환경에 맞게 '/web/items' 등으로 수정)
+        navigate('/'); 
+      }
     }
   };
 
@@ -172,6 +185,18 @@ const WebDetail = () => {
                     <div style={{ textAlign: 'center', marginTop: 10, fontSize: 13, color: '#e74c3c' }}>
                       💡 회수 신청은 로그인 후 이용할 수 있습니다.
                     </div>
+                  )}
+                  {user && user.role === 'ADMIN' && (
+                    <button 
+                      onClick={handleDelete}
+                      style={{
+                        width:'100%', padding:15, marginTop:10, 
+                        background:'white', color:'#e03131', border:'1px solid #e03131',
+                        borderRadius:12, fontSize:15, fontWeight:'600', cursor:'pointer'
+                      }}
+                    >
+                      🗑️ 이 분실물 삭제 (관리자 전용)
+                    </button>
                   )}
                 </>
             ) : (
