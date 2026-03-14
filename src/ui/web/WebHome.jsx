@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Menu, ChevronRight } from 'lucide-react'; 
 import { ItemContext } from '../../context/ItemContext';
@@ -30,49 +30,63 @@ const CATEGORY_DATA = {
 };
 
 const WebHome = () => {
-  const { items } = useContext(ItemContext);
+  const { items, fetchItems } = useContext(ItemContext); 
   const navigate = useNavigate();
 
-  // -----------------------------------------------------------
-  // 1. [상태 관리] 데이터 필터링 및 정렬을 위한 상태값
-  // -----------------------------------------------------------
-  const [activeCategory, setActiveCategory] = useState('전체'); // 현재 선택된 카테고리
-  const [sortBy, setSortBy] = useState('date'); // 정렬 기준 (date: 최신순, views: 조회순)
-  const [searchTerm, setSearchTerm] = useState(''); // 검색창 입력값
+  const [activeCategory, setActiveCategory] = useState('전체'); 
+  const [sortBy, setSortBy] = useState('date'); 
+  const [searchTerm, setSearchTerm] = useState(''); 
 
-  // -----------------------------------------------------------
-  // 2. [UI 액션] 로고 클릭 시 모든 검색/필터 상태 초기화 및 홈 복귀
-  // -----------------------------------------------------------
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const observerRef = useRef(null);
+
   const handleLogoClick = () => {
     setActiveCategory('전체'); 
     setSearchTerm('');         
     setSortBy('date');         
     navigate('/');             
-    window.scrollTo(0, 0);     
+    window.scrollTo(0, 0);   
+    setPage(1);
+    setHasMore(true);
+    fetchItems(1, false); 
   };
 
-  // -----------------------------------------------------------
-  // 3. [데이터 가공] 원본 목록(items)에 카테고리 -> 검색 -> 정렬 순차 적용
-  // -----------------------------------------------------------
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasMore) {
+        setPage((prevPage) => prevPage + 1);
+      }
+    }, { threshold: 0.5 });
+
+    if (observerRef.current) observer.observe(observerRef.current);
+
+    return () => observer.disconnect();
+  }, [hasMore]); 
+
+  useEffect(() => {
+    if (page > 1) {
+      const loadMore = async () => {
+        const moreAvailable = await fetchItems(page, true); 
+        setHasMore(moreAvailable); // 더 이상 가져올 게 없으면 false가 됨
+      };
+      loadMore();
+    }
+  }, [page, fetchItems]);
+
   const getProcessedItems = () => {
     let processed = items;
 
-    // (1) 카테고리 필터링 적용
     if (activeCategory !== '전체') {
-      // 선택한 값이 '대분류'인지(CATEGORY_DATA의 키값인지) 확인
       const isMajorCategory = Object.keys(CATEGORY_DATA).includes(activeCategory);
-
       if (isMajorCategory) {
-        // 대분류 클릭 시: 해당 대분류에 속한 '모든 소분류' 목록을 포함하여 필터링
         const subCategories = CATEGORY_DATA[activeCategory];
         processed = processed.filter(item => subCategories.includes(item.category));
       } else {
-        // 소분류 클릭 시: 정확히 이름이 일치하는 아이템만 필터링
         processed = processed.filter(item => item.category === activeCategory);
       }
     }
 
-    // (2) 텍스트 검색 필터링 적용 (대소문자 구분 없이 물건명/제목 기준 검색)
     if (searchTerm.trim() !== '') {
       const lowerQuery = searchTerm.toLowerCase();
       processed = processed.filter(item => {
@@ -80,26 +94,20 @@ const WebHome = () => {
       });
     }
     
-    // (3) 정렬 로직 적용
     return [...processed].sort((a, b) => {
       if (sortBy === 'date') {
-        return new Date(b.date) - new Date(a.date); // 최신 날짜 우선
+        return new Date(b.date) - new Date(a.date); 
       } else if (sortBy === 'views') {
-        return (b.views || 0) - (a.views || 0); // 조회수 높은 순 우선
+        return (b.views || 0) - (a.views || 0); 
       }
       return 0;
     });
   };
 
-  // 필터링이 완료된 최종 렌더링용 배열
   const finalItems = getProcessedItems();
 
   return (
     <div className="pc-container">
-      
-      {/* --------------------------------------------------
-          [상단 헤더 영역] 로고, 검색창, 메뉴 버튼
-          -------------------------------------------------- */}
       <header className="pc-header">
         <div className="header-inner">
           <div className="logo" onClick={handleLogoClick} style={{cursor:'pointer'}}>
@@ -124,12 +132,7 @@ const WebHome = () => {
         </div>
       </header>
 
-      {/* --------------------------------------------------
-          [메인 영역] 카테고리 메뉴, 정렬 탭, 물건 그리드 리스트
-          -------------------------------------------------- */}
       <main className="pc-main">
-        
-        {/* [좌측 카테고리 드롭다운 메뉴] */}
         <div className="category-dropdown-container">
           <div className="dropdown-trigger">
             <Menu size={24} color="white" />
@@ -141,7 +144,6 @@ const WebHome = () => {
               <span className="menu-text">전체 보기</span>
             </li>
             
-            {/* 대분류 순회 출력 및 마우스 오버 시 소분류 서브메뉴 표시 */}
             {Object.keys(CATEGORY_DATA).map((majorCat) => (
               <li key={majorCat} className="menu-item-li">
                 <span className="menu-text">{majorCat}</span>
@@ -155,7 +157,7 @@ const WebHome = () => {
                         key={subCat} 
                         className="sub-cat-btn"
                         onClick={(e) => {
-                          e.stopPropagation(); // 이벤트 버블링 방지
+                          e.stopPropagation(); 
                           setActiveCategory(subCat);
                         }}
                       >
@@ -169,7 +171,6 @@ const WebHome = () => {
           </ul>
         </div>
 
-        {/* [리스트 상단 헤더 및 정렬 옵션] */}
         <div className="section-header">
           <h2>
              {searchTerm 
@@ -195,14 +196,13 @@ const WebHome = () => {
           </div>
         </div>
 
-        {/* [분실물 리스트 그리드 출력 영역] */}
         <div className="pc-grid">
           {finalItems.length > 0 ? (
             finalItems.map((data) => (
               <div 
                 key={data.id} 
                 className="pc-card"
-                onClick={() => navigate(`/detail/${data.id}`)} // 카드 클릭 시 상세 페이지 이동
+                onClick={() => navigate(`/detail/${data.id}`)} 
               >
                 <div className="card-img" style={{backgroundColor: data.imgColor || '#eee', overflow: 'hidden'}}>
                   {data.image ? (
@@ -231,15 +231,23 @@ const WebHome = () => {
               </div>
             ))
           ) : (
-            // 결과 없음 처리 화면
             <div style={{ gridColumn: '1 / -1', padding: 100, textAlign: 'center', color: '#888', background: 'white', borderRadius: 16 }}>
               {searchTerm ? `"${searchTerm}"에 대한 검색 결과가 없습니다.` : '해당 카테고리의 물건이 없습니다.'}
             </div>
           )}
         </div>
+
+        {hasMore && (
+          <div 
+            ref={observerRef} 
+            style={{ padding: '30px', textAlign: 'center', color: '#999', width: '100%' }}
+          >
+            데이터를 불러오는 중입니다... 🌀
+          </div>
+        )}
+
       </main>
 
-      {/* 푸터 영역 */}
       <footer className="pc-footer">
         <p>© 2026 ALAF Team. All rights reserved.</p>
       </footer>

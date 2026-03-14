@@ -34,10 +34,11 @@ export const ItemProvider = ({ children }) => {
   const [items, setItems] = useState([]); 
   const BASE_URL = 'http://49.50.138.248:8080'; 
 
-  // 전체 분실물 목록 조회
-  const fetchItems = async () => {
+  // 전체 분실물 목록 조회 (페이지 및 이어붙이기 로직 추가)
+  const fetchItems = async (page = 1, isAppend = false) => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/items`);
+      // 1. 백엔드에 페이지 번호 요청 (기본 20개씩)
+      const response = await axios.get(`${BASE_URL}/api/items?page=${page}&limit=20`);
       
       const mappedList = response.data.map(dbItem => ({
         id: dbItem.item_id,
@@ -45,18 +46,30 @@ export const ItemProvider = ({ children }) => {
         date: dbItem.created_at ? dbItem.created_at.split('T')[0] : '', 
         image: dbItem.image_url ? `${BASE_URL}${dbItem.image_url}` : null, 
         category: CATEGORY_ID_MAP[dbItem.category_id] || '기타물품',
-        status: dbItem.display_status || dbItem.status || '보관중'
+        status: dbItem.display_status || dbItem.status || '보관중',
+        views: dbItem.views || 0 // (선택) 조회수 방어코드
       }));
       
-      setItems(mappedList);
+      // 2. 무한 스크롤이면 기존 데이터 뒤에 이어 붙이고, 아니면 새로 덮어쓰기
+      if (isAppend) {
+        setItems(prev => [...prev, ...mappedList]);
+      } else {
+        setItems(mappedList);
+      }
+
+      // 3. 백엔드에서 준 데이터가 20개 미만이면 "더 이상 가져올 게 없다(false)"고 프론트에 알림
+      return mappedList.length === 20;
     } catch (error) {
       console.error("목록 로드 실패:", error);
+      return false; // 에러 나면 멈춤
     }
   };
 
+  // 처음 렌더링될 때 1페이지 로드
   useEffect(() => {
-    fetchItems();
+    fetchItems(1, false);
   }, []);
+
 
   // 특정 분실물 상세 조회
   const getItemDetail = async (id) => {
