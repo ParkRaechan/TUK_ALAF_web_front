@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Menu, ChevronRight } from 'lucide-react'; 
 import { ItemContext } from '../../context/ItemContext';
@@ -39,7 +39,6 @@ const WebHome = () => {
 
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const observerRef = useRef(null);
 
   const handleLogoClick = () => {
     setActiveCategory('전체'); 
@@ -47,32 +46,19 @@ const WebHome = () => {
     setSortBy('date');         
     navigate('/');             
     window.scrollTo(0, 0);   
+    
+    // 초기화 시 1페이지로 리셋
     setPage(1);
     setHasMore(true);
     fetchItems(1, false); 
   };
-
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && hasMore) {
-        setPage((prevPage) => prevPage + 1);
-      }
-    }, { threshold: 0.5 });
-
-    if (observerRef.current) observer.observe(observerRef.current);
-
-    return () => observer.disconnect();
-  }, [hasMore]); 
-
-  useEffect(() => {
-    if (page > 1) {
-      const loadMore = async () => {
-        const moreAvailable = await fetchItems(page, true); 
-        setHasMore(moreAvailable); // 더 이상 가져올 게 없으면 false가 됨
-      };
-      loadMore();
-    }
-  }, [page, fetchItems]);
+  const handleLoadMore = async () => {
+    const nextPage = page + 1;
+    const moreAvailable = await fetchItems(nextPage, true);
+    
+    setPage(nextPage);
+    setHasMore(moreAvailable);
+  };
 
   const getProcessedItems = () => {
     let processed = items;
@@ -237,12 +223,27 @@ const WebHome = () => {
           )}
         </div>
 
-        {hasMore && (
-          <div 
-            ref={observerRef} 
-            style={{ padding: '30px', textAlign: 'center', color: '#999', width: '100%' }}
-          >
-            데이터를 불러오는 중입니다... 🌀
+        {hasMore && finalItems.length > 0 && (
+          <div style={{ textAlign: 'center', padding: '40px 0' }}>
+            <button 
+              onClick={handleLoadMore}
+              style={{
+                padding: '12px 32px',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                color: '#fff',
+                backgroundColor: '#3b82f6',
+                border: 'none',
+                borderRadius: '24px',
+                cursor: 'pointer',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#9bb6ee'}
+              onMouseOut={(e) => e.target.style.backgroundColor = '#97a4ba'}
+            >
+              더보기  
+            </button>
           </div>
         )}
 
