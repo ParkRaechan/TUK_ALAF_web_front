@@ -37,6 +37,11 @@ const WebLogin = () => {
       password: inputs.pw 
     })
     .then((res) => {
+      if (!res.data || !res.data.token || !res.data.user) {
+        // catch 블록으로 에러를 던져버림
+        throw new Error(res.data?.message || '아이디 또는 비밀번호가 올바르지 않습니다.');
+      }
+
       // 인증 성공 시 서버에서 발급한 JWT 토큰과 유저 정보를 받음
       const { token, user } = res.data;
       
