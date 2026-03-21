@@ -65,9 +65,9 @@ const CommunityDetail = () => {
                 src={`http://49.50.138.248:8080${post.images[0]}`} 
                 alt="게시글 첨부" 
                 style={{ 
-                    maxWidth: '100%', // 가로가 부모보다 커지지 않게
-                    maxHeight: '500px', // ★ 세로 최대 크기 제한 (너무 크면 이 값을 줄이세요!)
-                    objectFit: 'contain', // 원본 비율 유지하면서 영역 안에 쏙 들어가게 (여백 생길 수 있음)
+                    maxWidth: '100%', 
+                    maxHeight: '500px', 
+                    objectFit: 'contain',
                     borderRadius: 12 
                 }} />
             </div>

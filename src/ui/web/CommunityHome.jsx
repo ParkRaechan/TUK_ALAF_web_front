@@ -66,15 +66,15 @@ const CommunityHome = () => {
             <div key={post.post_id} className="pc-card" onClick={() => navigate(`/community/${post.post_id}`)}>
               <div className="card-img" style={{
                 backgroundColor: '#eee', 
-                aspectRatio: '16/9', // 썸네일을 16:9 비율로 고정 (안 예쁘면 1/1로 바꾸셔도 됩니다)
-                overflow: 'hidden', // 비율 넘치는 이미지 잘라내기
+                aspectRatio: '16/9', 
+                overflow: 'hidden',
                 display: 'flex', alignItems: 'center', justifyContent: 'center' // 이미지 중앙 정렬
                 }}>
                 {post.thumbnail ? (
                     <img src={`http://49.50.138.248:8080${post.thumbnail}`} alt="썸네일" 
                     style={{ 
                         width: '100%', height: '100%', 
-                        objectFit: 'cover' // 가득 채우면서 비율 유지 (가장 중요!)
+                        objectFit: 'cover'
                     }} />
                 ) : (
                   <span className="img-text">No Image</span>

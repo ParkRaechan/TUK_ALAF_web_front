@@ -98,7 +98,6 @@ const CommunityWrite = () => {
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             
-            {/* 글 유형 선택 (라디오 버튼 대신 예쁜 버튼 스타일) */}
             <div>
               <label style={{ display: 'block', marginBottom: 10, fontWeight: 'bold' }}>어떤 글인가요?</label>
               <div style={{ display: 'flex', gap: 10 }}>
