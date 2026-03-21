@@ -13,7 +13,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   // [2] StrictMode: 개발 모드에서 잠재적인 문제를 감지하기 위한 안전장치
   // (※ 주의: 이것 때문에 개발 중에는 console.log가 두 번씩 찍힐 수 있음 -> 정상임!)
-  <React.StrictMode>
+  //<React.StrictMode>
     <App />
-  </React.StrictMode>
+  //</React.StrictMode>
 );

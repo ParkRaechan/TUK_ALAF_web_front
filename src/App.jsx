@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 // -----------------------------------------------------------
@@ -11,7 +10,7 @@ import WebRegister from './ui/web/WebRegister';
 import WebMyPage from './ui/web/WebMyPage';
 import WebSignup from './ui/web/WebSignup';
 import WebTerms from './ui/web/WebTerms';
-
+/*
 // (2) 키오스크(Raspberry Pi)용 페이지
 import KioskHome from './ui/kiosk/KioskHome';
 import KioskRegister from './ui/kiosk/KioskRegister';
@@ -21,17 +20,21 @@ import KioskConfirm from './ui/kiosk/KioskConfirm';
 import KioskLogin from './ui/kiosk/KioskLogin';
 import KioskRecoveryList from './ui/kiosk/KioskRecoveryList';
 import KioskRetrievalLocker from './ui/kiosk/KioskRetrievalLocker';
-
+*/
 // Admin 페이지
 import AdminRequests from './ui/web/AdminRequests';
 
+//커뮤니티
+import CommunityHome from './ui/web/CommunityHome';
+import CommunityDetail from './ui/web/CommunityDetail';
+import CommunityWrite from './ui/web/CommunityWrite';
 // -----------------------------------------------------------
 // [2] Context (데이터 공급소) 불러오기
 // -----------------------------------------------------------
 import { ItemProvider } from './context/ItemContext'; // 분실물 데이터
 import { UserProvider } from './context/UserContext'; // 유저 로그인 정보
-import { KioskItemProvider } from './context/KioskItemContext';
-import { KioskUserProvider } from './context/KioskUserContext';
+//import { KioskItemProvider } from './context/KioskItemContext';
+//import { KioskUserProvider } from './context/KioskUserContext';
 
 import './App.css';
 
@@ -67,8 +70,8 @@ function App() {
     // -----------------------------------------------------------
     <UserProvider>
       <ItemProvider>
-        <KioskUserProvider>
-          <KioskItemProvider>
+        {/*<KioskUserProvider>*/}
+          {/* <KioskItemProvider>*/}
     {/* [4] 라우터 설정 (주소별 화면 연결) */}
         <BrowserRouter>
           <Routes>
@@ -84,29 +87,28 @@ function App() {
             <Route path="/signup" element={<WebSignup />} />     {/* 회원가입 페이지 */}
             <Route path="/terms/:id" element={<WebTerms />} />
             <Route path="/admin/requests" element={<AdminRequests />} />
-
+            <Route path="/community" element={<CommunityHome />} />
+            <Route path="/community/write" element={<CommunityWrite />} />
+            <Route path="/community/:id" element={<CommunityDetail />} />
 
             {/* =======================================================
                 [Section B] 키오스크 전용 라우팅
                 (라즈베리파이 터치스크린에서 보여줄 화면들 - '/kiosk'로 시작)
                ======================================================= */}
-            <Route path="/kiosk" element={<KioskHome />} /> {/* 키오스크 메인 */}
-            
-            {/* --- 등록 절차 --- */}
-            <Route path="/kiosk/register" element={<KioskRegister />} /> {/* 1. 정보 입력 */}
-            <Route path="/kiosk/capture" element={<KioskCapture />} />   {/* 2. 사진 촬영 */}
-            <Route path="/kiosk/locker" element={<KioskLocker />} />     {/* 3. 보관함 열림 */}
-            <Route path="/kiosk/confirm" element={<KioskConfirm />} />   {/* 4. 완료 확인 */}
-            
-            {/* --- 회수 절차 --- */}
-            <Route path="/kiosk/login" element={<KioskLogin />} />       {/* 1. 로그인 */}
-            <Route path="/kiosk/recovery-List" element={<KioskRecoveryList />} /> {/* 2. 목록 선택 */}
-            <Route path="/kiosk/retrieval-locker" element={<KioskRetrievalLocker />} /> {/* 3. 회수함 열림 */}
+           {/*<Route path="/kiosk" element={<KioskHome />} /> 
 
+            <Route path="/kiosk/register" element={<KioskRegister />} /> 
+            <Route path="/kiosk/capture" element={<KioskCapture />} />  
+            <Route path="/kiosk/locker" element={<KioskLocker />} />     
+            <Route path="/kiosk/confirm" element={<KioskConfirm />} /> 
+            
+            <Route path="/kiosk/login" element={<KioskLogin />} />       
+            <Route path="/kiosk/recovery-List" element={<KioskRecoveryList />} /> 
+            <Route path="/kiosk/retrieval-locker" element={<KioskRetrievalLocker />} /> */}
           </Routes>
         </BrowserRouter>
-          </KioskItemProvider>
-        </KioskUserProvider>
+        {/*  </KioskItemProvider>*/}
+        {/*</KioskUserProvider>*/}
       </ItemProvider>
    </UserProvider>
   );

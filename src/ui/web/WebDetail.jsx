@@ -1,9 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ItemContext } from '../../context/ItemContext';
 import { UserContext } from '../../context/UserContext';
 import { ArrowLeft, MapPin, Calendar, AlertCircle } from 'lucide-react';
 import axios from 'axios';
+import { Eye } from 'lucide-react';
 
 // 분실물 상세 정보 확인 및 소유권(회수) 주장 페이지
 const WebDetail = () => {
@@ -28,7 +29,7 @@ const WebDetail = () => {
       setLoading(false); 
     };
     loadData();
-  }, [id, getItemDetail]);
+  }, [id,getItemDetail]);
 
   // -----------------------------------------------------------
   // [회수 신청] 본인 물건임을 증명하는 데이터 서버 전송
@@ -89,6 +90,7 @@ const WebDetail = () => {
            >
              <ArrowLeft size={24} /> 뒤로가기
            </button>
+           <span style={{color:'#000000'}}>테스트용으로 만든 웹 등록입니다.</span>
         </div>
       </header>
 
@@ -140,6 +142,11 @@ const WebDetail = () => {
                  <MapPin size={20} color="#adb5bd"/> 
                  <span style={{fontWeight:'600', minWidth:60}}>습득장소</span>
                  <span>{item.location}</span>
+               </div>
+               <div style={{display:'flex', gap:12, alignItems:'center', color:'#495057'}}>
+                <Eye size={20} color="#adb5bd"/>
+                 <span style={{fontWeight:'600', minWidth:60}}>조회수</span>
+                 <span>{item.view_count}</span>
                </div>
             </div>
 

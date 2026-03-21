@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Menu, ChevronRight } from 'lucide-react'; 
 import { ItemContext } from '../../context/ItemContext';
@@ -84,7 +84,7 @@ const WebHome = () => {
       if (sortBy === 'date') {
         return new Date(b.date) - new Date(a.date); 
       } else if (sortBy === 'views') {
-        return (b.views || 0) - (a.views || 0); 
+        return (b.view_count || 0) - (a.view_count || 0);
       }
       return 0;
     });
@@ -112,7 +112,8 @@ const WebHome = () => {
           </div>
 
           <div className="pc-nav-menu">
-             <button className="menu-item primary" onClick={() => navigate('/register')}>분실물 등록</button>
+             <button className="menu-item primary" onClick={() => navigate('/register')}>분실물 등록(등록테스트용)</button>
+             <button className="menu-item primary" onClick={() => navigate('/community')}>커뮤니티</button>
              <button className="menu-item" onClick={() => navigate('/mypage')}>마이페이지</button>
           </div>
         </div>
@@ -208,7 +209,7 @@ const WebHome = () => {
                     <span className="card-date">{data.date}</span>
                   </div>
                   <div style={{ fontSize: 12, color: '#aaa', marginTop: 5 }}>
-                    조회 {data.views || 0}회
+                    조회 {data.view_count || 0}회
                   </div>
                   <div className={`card-status ${data.status === '해결됨' ? 'done' : ''}`}>
                     {data.status}

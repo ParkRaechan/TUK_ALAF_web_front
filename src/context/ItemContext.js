@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 // 웹 전용 분실물 전역 상태 관리 컨텍스트
@@ -47,7 +47,7 @@ export const ItemProvider = ({ children }) => {
         image: dbItem.image_url ? `${BASE_URL}${dbItem.image_url}` : null, 
         category: CATEGORY_ID_MAP[dbItem.category_id] || '기타물품',
         status: dbItem.display_status || dbItem.status || '보관중',
-        views: dbItem.views || 0 // (선택) 조회수 방어코드
+        view_count: dbItem.view_count || 0
       }));
       
       // 2. 무한 스크롤이면 기존 데이터 뒤에 이어 붙이고, 아니면 새로 덮어쓰기
@@ -87,7 +87,8 @@ export const ItemProvider = ({ children }) => {
         status: data.status,
         desc: data.description, 
         is_available: data.is_available, 
-        lock_message: data.lock_message
+        lock_message: data.lock_message,
+        view_count: data.view_count
       };
     } catch (error) {
       console.error("상세 정보 로드 실패:", error);
