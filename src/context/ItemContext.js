@@ -34,13 +34,18 @@ export const ItemProvider = ({ children }) => {
   const [items, setItems] = useState([]); 
   const BASE_URL = 'http://49.50.138.248:8080'; 
 
-  // 전체 분실물 목록 조회 (페이지 및 이어붙이기 로직 추가)
-  const fetchItems = async (page = 1, isAppend = false) => {
+  // 전체 분실물 목록 조회 (커서 기반 페이징)
+  const fetchItems = async (cursor = null, isAppend = false) => {
     try {
-      // 1. 백엔드에 페이지 번호 요청 (기본 20개씩)
-      const response = await axios.get(`${BASE_URL}/api/items?page=${page}&limit=20`);
+      // 1. 백엔드에 커서 요청 (기본 20개씩)
+      const params = new URLSearchParams();
+      if (cursor) params.append('cursor', cursor);
+      params.append('limit', '20');
+      const response = await axios.get(`${BASE_URL}/api/items?${params.toString()}`);
       
-      const mappedList = response.data.map(dbItem => ({
+      const { items: apiItems, nextCursor } = response.data;
+      
+      const mappedList = apiItems.map(dbItem => ({
         id: dbItem.item_id,
         title: dbItem.name,
         date: dbItem.created_at ? dbItem.created_at.split('T')[0] : '', 
@@ -57,17 +62,17 @@ export const ItemProvider = ({ children }) => {
         setItems(mappedList);
       }
 
-      // 3. 백엔드에서 준 데이터가 20개 미만이면 "더 이상 가져올 게 없다(false)"고 프론트에 알림
-      return mappedList.length === 20;
+      // 3. 다음 커서 반환 (null이면 더 이상 없음)
+      return nextCursor || null;
     } catch (error) {
       console.error("목록 로드 실패:", error);
-      return false; // 에러 나면 멈춤
+      return null; // 에러 나면 멈춤
     }
   };
 
-  // 처음 렌더링될 때 1페이지 로드
+  // 처음 렌더링될 때 초기 로드
   useEffect(() => {
-    fetchItems(1, false);
+    fetchItems(null, false);
   }, []);
 
 

@@ -43,18 +43,13 @@ const CommunityHome = () => {
 
       <main className="pc-main">
         {/* 커뮤니티 전용 탭 */}
-        <div style={{ display: 'flex', gap: 10, marginBottom: 30, justifyContent: 'center' }}>
+        <div className="community-tabs">
           {['ALL', 'LOST', 'LOOKING_FOR'].map((type) => (
             <button 
               key={type}
+              className={`community-tab-btn ${postType === type ? 'active' : ''}`}
               onClick={() => setPostType(type)}
-              style={{
-                padding: '12px 30px', borderRadius: 25, fontWeight: 'bold', fontSize: 16, cursor: 'pointer',
-                border: postType === type ? 'none' : '1px solid #ddd',
-                backgroundColor: postType === type ? '#3b82f6' : 'white',
-                color: postType === type ? 'white' : '#666',
-                boxShadow: postType === type ? '0 4px 10px rgba(59, 130, 246, 0.3)' : 'none'
-              }}>
+            >
               {type === 'ALL' ? '전체 보기' : type === 'LOST' ? '🙌 습득했어요' : '👀 찾고있어요'}
             </button>
           ))}
