@@ -37,7 +37,7 @@ const WebHome = () => {
   const [sortBy, setSortBy] = useState('date'); 
   const [searchTerm, setSearchTerm] = useState(''); 
 
-  const [cursor, setCursor] = useState(null);
+  const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
   const handleLogoClick = () => {
@@ -47,16 +47,17 @@ const WebHome = () => {
     navigate('/');             
     window.scrollTo(0, 0);   
     
-    // 초기화 시 커서 리셋
-    setCursor(null);
+    // 초기화 시 1페이지로 리셋
+    setPage(1);
     setHasMore(true);
-    fetchItems(null, false); 
+    fetchItems(1, false); 
   };
   const handleLoadMore = async () => {
-    const nextCursor = await fetchItems(cursor, true);
+    const nextPage = page + 1;
+    const moreAvailable = await fetchItems(nextPage, true);
     
-    setCursor(nextCursor);
-    setHasMore(!!nextCursor);
+    setPage(nextPage);
+    setHasMore(moreAvailable);
   };
 
   const getProcessedItems = () => {
