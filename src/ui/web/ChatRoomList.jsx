@@ -41,7 +41,7 @@ const ChatRoomList = () => {
               <div 
                 key={room.room_id} 
                 className="room-card" 
-                onClick={() => navigate(`/chat/room/${room.room_id}`)} // ★ 회원님의 채팅방 상세 경로에 맞게 수정하세요!
+                onClick={() => navigate(`/chat/${room.room_id}`)}
               >
                 <div className="room-avatar">
                   {room.partner_name.charAt(0)} {/* 프로필 대신 이름 첫 글자 */}
