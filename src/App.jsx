@@ -11,6 +11,7 @@ import WebMyPage from './ui/web/WebMyPage';
 import WebSignup from './ui/web/WebSignup';
 import WebTerms from './ui/web/WebTerms';
 import WebLogin from './ui/web/WebLogin';
+import ChatRoom from './ui/web/ChatRoom';
 /*
 // (2) 키오스크(Raspberry Pi)용 페이지
 import KioskHome from './ui/kiosk/KioskHome';
@@ -92,6 +93,7 @@ function App() {
             <Route path="/community/write" element={<CommunityWrite />} />
             <Route path="/community/:id" element={<CommunityDetail />} />
             <Route path="/login" element={<WebLogin />} />
+            <Route path="/chat/:roomId" element={<ChatRoom />} />
             {/* =======================================================
                 [Section B] 키오스크 전용 라우팅
                 (라즈베리파이 터치스크린에서 보여줄 화면들 - '/kiosk'로 시작)

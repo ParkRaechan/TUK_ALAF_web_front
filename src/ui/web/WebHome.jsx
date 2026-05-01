@@ -114,7 +114,7 @@ const WebHome = () => {
 
           <div className="pc-nav-menu">
              {/* ★ 버튼 클래스 통일 (primary 제거) ★ */}
-             <button className="menu-item" onClick={() => navigate('/register')}>분실물 등록</button>
+             <button className="menu-item" onClick={() => navigate('/register')}>분실물 등록(테스트용)</button>
              <button className="menu-item" onClick={() => navigate('/community')}>커뮤니티</button>
              <button className="menu-item" onClick={() => navigate('/mypage')}>마이페이지</button>
           </div>

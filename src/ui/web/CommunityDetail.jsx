@@ -24,6 +24,32 @@ const CommunityDetail = () => {
     fetchDetail();
   }, [id, navigate]);
 
+  // 채팅방 생성 및 이동 함수 추가
+  const handleChatClick = async () => {
+    if (!user) {
+      alert('채팅은 로그인 후 이용 가능합니다.');
+      // navigate('/login'); // 필요시 로그인 페이지로 이동
+      return;
+    }
+
+    try {
+      // 백엔드로 채팅방 생성/조회 요청
+      const response = await axios.post('http://49.50.138.248:8080/api/chat/rooms', {
+        postId: id,                // 현재 커뮤니티 게시글 ID
+        receiverId: post.member_id // 글 작성자 ID
+      }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } // 인증 토큰 포함
+      });
+      
+      const { roomId } = response.data;
+      // 생성된 채팅방으로 이동
+      navigate(`/chat/${roomId}`);
+    } catch (error) {
+      console.error(error);
+      alert('채팅방을 열 수 없습니다. 서버 상태를 확인해주세요.');
+    }
+  };
+
   if (!post) return <div className="comm-detail-loading">데이터 불러오는 중...</div>;
 
   const isMyPost = user && user.id === post.member_id;
@@ -90,7 +116,7 @@ const CommunityDetail = () => {
             ) : (
               <button 
                 className="chat-btn"
-                onClick={() => alert("채팅 기능은 향후 업데이트 예정입니다! 기대해주세요.")}
+                onClick={handleChatClick}
               >
                 <MessageCircle size={20} />
                 <span>작성자에게 1:1 채팅 보내기</span>
