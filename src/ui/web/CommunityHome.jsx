@@ -35,6 +35,7 @@ const CommunityHome = () => {
             <h1 className="logo-text">ALAF</h1>
           </div>
           <div className="pc-nav-menu">
+            <button className="menu-item" onClick={() => navigate('/chat/list')}>내 채팅</button>
              {/* ★ 이모티콘 제거 및 primary-btn 클래스 삭제 (투명화) ★ */}
              <button className="menu-item" onClick={() => navigate('/community/write')}>글쓰기</button>
              <button className="menu-item" onClick={() => navigate('/')}>돌아가기</button>

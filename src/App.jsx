@@ -94,6 +94,7 @@ function App() {
             <Route path="/community/:id" element={<CommunityDetail />} />
             <Route path="/login" element={<WebLogin />} />
             <Route path="/chat/:roomId" element={<ChatRoom />} />
+            <Route path="/chat/list" element={<ChatRoomList />} />
             {/* =======================================================
                 [Section B] 키오스크 전용 라우팅
                 (라즈베리파이 터치스크린에서 보여줄 화면들 - '/kiosk'로 시작)
