@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './WebHome.css';
+import './CommunityHome.css'; 
 
 const CommunityHome = () => {
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
-  const [postType, setPostType] = useState('ALL'); // ALL, LOST, LOOKING_FOR
+  const [postType, setPostType] = useState('ALL'); 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,7 +16,6 @@ const CommunityHome = () => {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      // type 파라미터로 필터링 요청
       const typeQuery = postType !== 'ALL' ? `?type=${postType}` : '';
       const response = await axios.get(`http://49.50.138.248:8080/api/posts${typeQuery}`);
       setPosts(response.data);
@@ -27,83 +26,81 @@ const CommunityHome = () => {
   };
 
   return (
-    <div className="pc-container">
+    <div className="comm-container">
+      
       <header className="pc-header">
         <div className="header-inner">
-          <div className="logo" onClick={() => navigate('/')} style={{cursor:'pointer'}}>
-            <h1>ALAF</h1>
-            <span className="logo-sub">Any Lost Any Found</span>
+          <div className="logo" onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <img src="/logo.jpg" alt="ALAF Logo" style={{ height: '36px', width: 'auto' }} />
+            <h1 className="logo-text">ALAF</h1>
           </div>
           <div className="pc-nav-menu">
-             <button className="menu-item primary" onClick={() => navigate('/community/write')}>✏️ 글쓰기</button>
-             <button className="menu-item" onClick={() => navigate('/')}>키오스크 보관함 가기</button>
+             {/* ★ 이모티콘 제거 및 primary-btn 클래스 삭제 (투명화) ★ */}
+             <button className="menu-item" onClick={() => navigate('/community/write')}>글쓰기</button>
+             <button className="menu-item" onClick={() => navigate('/')}>돌아가기</button>
           </div>
         </div>
       </header>
 
-      <main className="pc-main">
+      <main className="comm-main">
         {/* 커뮤니티 전용 탭 */}
-        <div style={{ display: 'flex', gap: 10, marginBottom: 30, justifyContent: 'center' }}>
+        <div className="comm-tabs">
           {['ALL', 'LOST', 'LOOKING_FOR'].map((type) => (
             <button 
               key={type}
               onClick={() => setPostType(type)}
-              style={{
-                padding: '12px 30px', borderRadius: 25, fontWeight: 'bold', fontSize: 16, cursor: 'pointer',
-                border: postType === type ? 'none' : '1px solid #ddd',
-                backgroundColor: postType === type ? '#3b82f6' : 'white',
-                color: postType === type ? 'white' : '#666',
-                boxShadow: postType === type ? '0 4px 10px rgba(59, 130, 246, 0.3)' : 'none'
-              }}>
-              {type === 'ALL' ? '전체 보기' : type === 'LOST' ? '🙌 습득했어요' : '👀 찾고있어요'}
+              className={`comm-tab-btn ${postType === type ? 'active' : ''}`}
+            >
+              {/* ★ 이모티콘 제거 ★ */}
+              {type === 'ALL' ? '전체 보기' : type === 'LOST' ? '습득했어요' : '찾고있어요'}
             </button>
           ))}
         </div>
 
-        <div className="pc-grid">
-          {loading ? <div style={{gridColumn: '1/-1', textAlign:'center'}}>로딩 중...</div> : 
-           posts.length > 0 ? posts.map((post) => (
-            <div key={post.post_id} className="pc-card" onClick={() => navigate(`/community/${post.post_id}`)}>
-              <div className="card-img" style={{
-                backgroundColor: '#eee', 
-                aspectRatio: '16/9', 
-                overflow: 'hidden',
-                display: 'flex', alignItems: 'center', justifyContent: 'center' // 이미지 중앙 정렬
-                }}>
-                {post.thumbnail ? (
-                    <img src={`http://49.50.138.248:8080${post.thumbnail}`} alt="썸네일" 
-                    style={{ 
-                        width: '100%', height: '100%', 
-                        objectFit: 'cover'
-                    }} />
-                ) : (
-                  <span className="img-text">No Image</span>
-                )}
-              </div>
-              <div className="card-info">
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <span style={{ fontSize: 12, color: post.post_type === 'LOST' ? '#2b8a3e' : '#e03131', fontWeight: 'bold' }}>
-                    {post.post_type === 'LOST' ? '습득물' : '분실물'}
-                    </span>
-                    {/* 카테고리 표시 뱃지 */}
-                    <span style={{ fontSize: 12, background: '#f1f3f5', color: '#495057', padding: '2px 8px', borderRadius: 12, fontWeight: '600' }}>
-                    {post.category_name}
-                    </span>
+        <div className="comm-grid">
+          {loading ? (
+            <div className="comm-empty">로딩 중...</div>
+          ) : posts.length > 0 ? (
+            posts.map((post) => (
+              <div key={post.post_id} className="comm-card" onClick={() => navigate(`/community/${post.post_id}`)}>
+                <div className="comm-card-img">
+                  {post.thumbnail ? (
+                      <img src={`http://49.50.138.248:8080${post.thumbnail}`} alt="썸네일" />
+                  ) : (
+                    <span className="img-text">No Image</span>
+                  )}
                 </div>
-                <h3 className="card-title" style={{ marginTop: 5 }}>{post.title}</h3>
-                <div className="card-meta" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span className="card-date">{new Date(post.created_at).toLocaleDateString()}</span>
-                  <span style={{ fontSize: 13, color: '#888' }}>{post.author_name}</span>
+                
+                <div className="comm-card-info">
+                  <div className="comm-card-tags">
+                      <span className={`type-badge ${post.post_type === 'LOST' ? 'lost' : 'looking'}`}>
+                        {post.post_type === 'LOST' ? '습득물' : '분실물'}
+                      </span>
+                      <span className="category-badge">
+                        {post.category_name}
+                      </span>
+                  </div>
+                  
+                  <h3 className="comm-card-title">{post.title}</h3>
+                  
+                  <div className="comm-card-meta">
+                    <span className="card-date">{new Date(post.created_at).toLocaleDateString()}</span>
+                    <span className="card-author">{post.author_name}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          )) : (
-            <div style={{ gridColumn: '1 / -1', padding: 100, textAlign: 'center', color: '#888', background: 'white', borderRadius: 16 }}>
+            ))
+          ) : (
+            <div className="comm-empty">
               게시글이 없습니다.
             </div>
           )}
         </div>
       </main>
+
+      <footer className="pc-footer">
+        <p>© 2026 ALAF Team. All rights reserved.</p>
+      </footer>
     </div>
   );
 };

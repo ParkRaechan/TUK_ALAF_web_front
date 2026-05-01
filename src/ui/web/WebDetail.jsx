@@ -2,26 +2,22 @@ import { useContext, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ItemContext } from '../../context/ItemContext';
 import { UserContext } from '../../context/UserContext';
-import { ArrowLeft, MapPin, Calendar, AlertCircle } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, AlertCircle, Eye, Trash2 } from 'lucide-react';
 import axios from 'axios';
-import { Eye } from 'lucide-react';
+import './WebDetail.css'; // ★ 전용 CSS 연결
 
-// 분실물 상세 정보 확인 및 소유권(회수) 주장 페이지
 const WebDetail = () => {
   const { id } = useParams();
   const { getItemDetail, deleteItem } = useContext(ItemContext);
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
   
-  // 현재 물품 데이터 및 로딩 상태 관리
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 회수 신청 폼(Form) 표시 여부 및 입력 데이터 상태 관리
   const [showForm, setShowForm] = useState(false);
   const [proofData, setProofData] = useState({ address: '', desc: '', file: null });
 
-  // 컴포넌트 마운트 시 물품 상세 정보 로드
   useEffect(() => {
     const loadData = async () => {
       const data = await getItemDetail(id);
@@ -29,147 +25,124 @@ const WebDetail = () => {
       setLoading(false); 
     };
     loadData();
-  }, [id,getItemDetail]);
+  }, [id, getItemDetail]);
 
-  // -----------------------------------------------------------
-  // [회수 신청] 본인 물건임을 증명하는 데이터 서버 전송
-  // -----------------------------------------------------------
   const submitClaim = async (e) => {
-    e.preventDefault(); // 폼 제출 시 페이지 새로고침 방지
+    e.preventDefault(); 
     
-    // 파일 업로드를 위한 FormData 구성
     const formData = new FormData();
     formData.append('item_id', id);
-    formData.append('proof_detail_address', proofData.address); // 주장하는 분실 상세 위치
-    formData.append('proof_description', proofData.desc);       // 물건의 특징 설명
-    if (proofData.file) formData.append('image', proofData.file); // 증거 사진 (선택)
+    formData.append('proof_detail_address', proofData.address); 
+    formData.append('proof_description', proofData.desc);       
+    if (proofData.file) formData.append('image', proofData.file); 
 
     try {
-      // 관리자 심사 대기열(requests)로 데이터 전송
       await axios.post('http://49.50.138.248:8080/api/requests', formData, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       alert('회수 신청이 완료되었습니다! (48시간 동안 선점됨)');
-      // 성공 시 페이지 새로고침하여 상태(is_available 등) 최신화
       window.location.reload(); 
     } catch (error) {
       alert(error.response?.data?.message || '신청 실패');
     }
   };
 
-  
   const handleDelete = async () => {
     const confirmDelete = window.confirm("정말 이 분실물을 삭제하시겠습니까?\n(삭제 후 복구할 수 없습니다.)");
     if (confirmDelete) {
       const isSuccess = await deleteItem(id);
       if (isSuccess) {
         alert("성공적으로 삭제되었습니다.");
-        // 삭제 후 목록 페이지로 강제 이동 (주소는 프로젝트 환경에 맞게 '/web/items' 등으로 수정)
         navigate('/'); 
       }
     }
   };
 
-  // 데이터 로드 중 처리
-  if (loading) return <div style={{padding:50, textAlign:'center'}}>데이터 불러오는 중...</div>;
-  if (!item) return <div style={{padding:50, textAlign:'center'}}>물건 정보를 찾을 수 없습니다.</div>;
+  if (loading) return <div className="detail-loading">데이터 불러오는 중...</div>;
+  if (!item) return <div className="detail-loading">물건 정보를 찾을 수 없습니다.</div>;
   
   return (
-    <div className="pc-container" style={{paddingBottom: 50, background:'#f8f9fa', minHeight:'100vh'}}>
+    <div className="detail-container">
       
-      {/* 상단 네비게이션 헤더 */}
+      {/* ★ 공통 헤더 + logo.jpg 적용 ★ */}
       <header className="pc-header">
         <div className="header-inner">
-           <button 
-             onClick={() => navigate(-1)} 
-             style={{
-               display:'flex', alignItems:'center', gap:5, 
-               cursor:'pointer', fontWeight:'bold', fontSize: 16, 
-               border:'none', background:'none', color:'#333'
-             }}
-           >
-             <ArrowLeft size={24} /> 뒤로가기
-           </button>
-           <span style={{color:'#000000'}}>테스트용으로 만든 웹 등록입니다.</span>
+          <div className="logo" onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <img src="/logo.jpg" alt="ALAF Logo" style={{ height: '36px', width: 'auto' }} />
+            <h1 className="logo-text">ALAF</h1>
+          </div>
+
+          <div className="pc-nav-menu">
+             <button className="menu-item" onClick={() => navigate(-1)}>
+               돌아가기
+             </button>
+          </div>
         </div>
       </header>
 
       {/* 메인 상세 정보 카드 영역 */}
-      <main className="pc-main" style={{ marginTop: 20 }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', display: 'flex', gap: 50, background: 'white', padding: 50, borderRadius: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+      <main className="detail-main">
+        <div className="detail-card">
           
           {/* [좌측 영역] 습득물 이미지 표시 */}
-          <div style={{ flex: 1 }}>
-            <div style={{
-              width:'100%', aspectRatio:'1/1', 
-              borderRadius:20, overflow:'hidden', border:'1px solid #eee',
-              display:'flex', alignItems:'center', justifyContent:'center', background:'#fafafa'
-            }}>
+          <div className="detail-image-wrapper">
+            <div className="detail-image-box">
               {item.image ? (
-                <img src={item.image} alt="물건" style={{width:'100%', height:'100%', objectFit:'contain'}} />
+                <img src={item.image} alt="물건" />
               ) : (
-                <span style={{color:'#ccc'}}>이미지 없음</span>
+                <span className="no-image-text">이미지 없음</span>
               )}
             </div>
           </div>
 
           {/* [우측 영역] 텍스트 정보 및 액션 버튼 */}
-          <div style={{ flex: 1, display:'flex', flexDirection:'column' }}>
+          <div className="detail-info-wrapper">
             
-            {/* 기본 정보: 카테고리, 제목, 상태 */}
-            <div>
-                <span style={{background:'#f1f3f5', color:'#495057', padding:'6px 12px', borderRadius:20, fontSize:13, fontWeight:'600'}}>
-                  {item.category}
-                </span>
-                <h1 style={{marginTop:15, marginBottom:10, fontSize:32, fontWeight:'800', color:'#212529'}}>
-                  {item.title}
-                </h1>
-                <p style={{color:'#868e96', fontSize:14}}>
+            <div className="info-header">
+                <span className="category-badge">{item.category}</span>
+                <h1 className="item-title">{item.title}</h1>
+                <p className={`item-status ${item.is_available === false ? 'status-unavailable' : 'status-available'}`}>
                   상태: {item.status}
                 </p>
             </div>
             
-            <div style={{height:1, background:'#eee', margin:'25px 0'}}></div>
+            <div className="detail-divider"></div>
 
-            {/* 습득 일자 및 장소 */}
-            <div style={{display:'flex', flexDirection:'column', gap:15}}>
-               <div style={{display:'flex', gap:12, alignItems:'center', color:'#495057'}}>
-                 <Calendar size={20} color="#adb5bd"/> 
-                 <span style={{fontWeight:'600', minWidth:60}}>습득일</span>
-                 <span>{item.date}</span>
+            <div className="info-list">
+               <div className="info-row">
+                 <Calendar size={18} /> 
+                 <span className="info-label">습득일</span>
+                 <span className="info-value">{item.date}</span>
                </div>
-               <div style={{display:'flex', gap:12, alignItems:'center', color:'#495057'}}>
-                 <MapPin size={20} color="#adb5bd"/> 
-                 <span style={{fontWeight:'600', minWidth:60}}>습득장소</span>
-                 <span>{item.location}</span>
+               <div className="info-row">
+                 <MapPin size={18} /> 
+                 <span className="info-label">습득장소</span>
+                 <span className="info-value">{item.location}</span>
                </div>
-               <div style={{display:'flex', gap:12, alignItems:'center', color:'#495057'}}>
-                <Eye size={20} color="#adb5bd"/>
-                 <span style={{fontWeight:'600', minWidth:60}}>조회수</span>
-                 <span>{item.view_count}</span>
+               <div className="info-row">
+                <Eye size={18} />
+                 <span className="info-label">조회수</span>
+                 <span className="info-value">{item.view_count}회</span>
                </div>
             </div>
 
-            <div style={{height:1, background:'#eee', margin:'25px 0'}}></div>
+            <div className="detail-divider"></div>
 
             {/* 허위 신청 경고 문구 */}
-            <div style={{
-                marginTop: 30, padding: '16px 20px', background: '#FFF5F5', color: '#C92A2A',
-                borderRadius: 8, fontSize: 13, lineHeight: 1.5, display:'flex', gap:12, alignItems:'flex-start'
-            }}>
-              <AlertCircle size={18} style={{marginTop:2, flexShrink:0}} />
-              <div>
-                <span style={{fontWeight:'bold'}}>본인의 물건이 확실한가요?</span> 타인의 물건을 허위로 수령 신청할 경우<br/>
-                관련 법에 의해 처벌받을 수 있습니다.
+            <div className="warning-box">
+              <AlertCircle size={18} className="warning-icon" />
+              <div className="warning-text">
+                <strong>본인의 물건이 확실한가요?</strong><br/>
+                타인의 물건을 허위로 수령 신청할 경우 관련 법에 의해 처벌받을 수 있습니다.
               </div>
             </div>
 
             {/* 수령 신청 액션 영역 */}
             {!showForm ? (
-                <>
+                <div className="action-area">
                   <button 
+                      className={`claim-btn ${item.is_available === false ? 'disabled' : ''}`}
                       onClick={() => {
-                          // 비회원일 경우 경고창을 띄우고 폼 여는 것을 차단
                           if (!user) {
                               alert('회수 신청은 회원만 가능합니다. 로그인 후 이용해주세요.');
                               return;
@@ -177,58 +150,55 @@ const WebDetail = () => {
                           setShowForm(true);
                       }} 
                       disabled={item.is_available === false}
-                      style={{
-                          width:'100%', padding:18, 
-                          background: item.is_available === false ? '#adb5bd' : '#343a40', 
-                          color:'white', borderRadius:12, fontSize:16, fontWeight:'700', 
-                          cursor: item.is_available === false ? 'not-allowed' : 'pointer', 
-                          marginTop:15, border:'none'
-                  }}>
+                  >
                     {item.is_available === false ? '현재 수령 불가' : '내 물건 수령 신청하기'}
                   </button>
                   
-                  {/* 비회원에게만 보이는 안내 문구 추가 */}
                   {!user && item.is_available !== false && (
-                    <div style={{ textAlign: 'center', marginTop: 10, fontSize: 13, color: '#e74c3c' }}>
+                    <div className="guest-notice">
                       💡 회수 신청은 로그인 후 이용할 수 있습니다.
                     </div>
                   )}
+
                   {user && user.role === 'ADMIN' && (
-                    <button 
-                      onClick={handleDelete}
-                      style={{
-                        width:'100%', padding:15, marginTop:10, 
-                        background:'white', color:'#e03131', border:'1px solid #e03131',
-                        borderRadius:12, fontSize:15, fontWeight:'600', cursor:'pointer'
-                      }}
-                    >
-                      🗑️ 이 분실물 삭제 (관리자 전용)
+                    <button className="admin-delete-btn" onClick={handleDelete}>
+                      <Trash2 size={16} /> 이 분실물 삭제 (관리자 전용)
                     </button>
                   )}
-                </>
+                </div>
             ) : (
                 // 증거 제출 폼 (본인 인증)
-                <form onSubmit={submitClaim} style={{marginTop: 20, padding: 20, border: '1px solid #ddd', borderRadius: 12}}>
-                    <h4 style={{marginBottom: 15, fontSize: 16}}>증거 제출 (본인 물건 인증)</h4>
+                <form className="claim-form" onSubmit={submitClaim}>
+                    <h4>증거 제출 (본인 물건 인증)</h4>
                     
-                    <label style={{fontSize: 13, fontWeight: 'bold'}}>증거 사진 첨부</label>
-                    <input type="file" accept="image/*" onChange={(e) => setProofData({...proofData, file: e.target.files[0]})} style={{marginBottom: 15, width: '100%'}} />
+                    <div className="form-group">
+                      <label>증거 사진 첨부</label>
+                      <input type="file" accept="image/*" onChange={(e) => setProofData({...proofData, file: e.target.files[0]})} />
+                    </div>
 
-                    <label style={{fontSize: 13, fontWeight: 'bold'}}>상세 습득 장소 유추</label>
-                    <input type="text" placeholder="예: A동 3층 화장실 세면대 위" value={proofData.address} onChange={(e) => setProofData({...proofData, address: e.target.value})} style={{width: '100%', padding: 10, marginBottom: 15, borderRadius: 8, border: '1px solid #ccc'}} />
+                    <div className="form-group">
+                      <label>상세 습득 장소 유추</label>
+                      <input type="text" placeholder="예: A동 3층 화장실 세면대 위" value={proofData.address} onChange={(e) => setProofData({...proofData, address: e.target.value})} className="input-field" />
+                    </div>
 
-                    <label style={{fontSize: 13, fontWeight: 'bold'}}>상세 설명 (물건 특징)</label>
-                    <textarea placeholder="예: 케이스 뒤에 라이언 스티커가 붙어있습니다." value={proofData.desc} onChange={(e) => setProofData({...proofData, desc: e.target.value})} style={{width: '100%', padding: 10, marginBottom: 15, borderRadius: 8, border: '1px solid #ccc', minHeight: 80}} />
-
-                    <div style={{display: 'flex', gap: 10}}>
-                        <button type="button" onClick={() => setShowForm(false)} style={{flex: 1, padding: 12, background: '#eee', border: 'none', borderRadius: 8, cursor: 'pointer'}}>취소</button>
-                        <button type="submit" style={{flex: 2, padding: 12, background: '#2b8a3e', color: 'white', border: 'none', borderRadius: 8, fontWeight: 'bold', cursor: 'pointer'}}>제출하기</button>
+                    <div className="form-group">
+                      <label>상세 설명 (물건 특징)</label>
+                      <textarea placeholder="예: 케이스 뒤에 라이언 스티커가 붙어있습니다." value={proofData.desc} onChange={(e) => setProofData({...proofData, desc: e.target.value})} className="textarea-field" />
+                    </div>
+                    
+                    <div className="detail-form-actions">
+                        <button type="button" className="detail-cancel-btn" onClick={() => setShowForm(false)}>취소</button>
+                        <button type="submit" className="detail-submit-btn">제출하기</button>
                     </div>
                 </form>
             )}
           </div>
         </div>
       </main>
+
+      <footer className="pc-footer">
+        <p>© 2026 ALAF Team. All rights reserved.</p>
+      </footer>
     </div>
   );
 };

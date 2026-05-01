@@ -3,23 +3,15 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
-// 관리자 전용 분실물 회수 신청 심사 목록 페이지
 const AdminRequests = () => {
-    // 심사 대기 중인 신청 목록 상태
     const [requests, setRequests] = useState([]);
     const navigate = useNavigate();
 
-    // 컴포넌트 마운트 시 대기 목록 자동 로드
     useEffect(() => {
         loadRequests();
     }, []);
-
-    // -----------------------------------------------------------
-    // 1. [목록 조회] 관리자 권한으로 신청 내역 가져오기
-    // -----------------------------------------------------------
     const loadRequests = async () => {
         try {
-            // 관리자 인증이 필요하므로 로컬 스토리지의 토큰을 헤더에 포함하여 요청
             const res = await axios.get('http://49.50.138.248:8080/api/admin/requests', {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
             });
@@ -29,11 +21,7 @@ const AdminRequests = () => {
         }
     };
 
-    // -----------------------------------------------------------
-    // 2. [심사 처리] 특정 신청건에 대한 승인/거절 로직
-    // -----------------------------------------------------------
     const handleProcess = async (requestId, action) => {
-        // 실수 방지를 위한 재확인 창
         if (!window.confirm(`정말 ${action === 'APPROVE' ? '승인' : '거절'} 처리하시겠습니까?`)) return;
 
         try {
@@ -41,7 +29,6 @@ const AdminRequests = () => {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
             });
             alert('처리 완료!');
-            // 심사 완료 후 목록을 최신 상태로 새로고침하여 UI 반영
             loadRequests(); 
         } catch (error) {
             alert('처리 실패');

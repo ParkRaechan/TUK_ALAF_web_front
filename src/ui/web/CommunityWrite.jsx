@@ -1,8 +1,10 @@
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../context/UserContext';
-import { ArrowLeft, Image as ImageIcon } from 'lucide-react';
+import { Image as ImageIcon } from 'lucide-react';
 import axios from 'axios';
+import './CommunityWrite.css'; // ★ 전용 CSS 연결
+
 const CATEGORY_DATA = {
   '가방': [{ id: 1, name: '여성용가방' }, { id: 2, name: '남성용가방' }, { id: 3, name: '기타가방' }],
   '귀금속': [{ id: 4, name: '반지' }, { id: 5, name: '목걸이' }, { id: 6, name: '귀걸이' }, { id: 7, name: '시계' }, { id: 8, name: '기타 귀금속' }],
@@ -29,16 +31,15 @@ const CommunityWrite = () => {
   const { user } = useContext(UserContext);
   
   const [formData, setFormData] = useState({
-    post_type: 'LOST', // 기본값: 습득
+    post_type: 'LOST', 
     title: '',
     content: '',
-    category_id: 1, // 기본 카테고리 ID
+    category_id: 1, 
     image: null
   });
   const [majorCategory, setMajorCategory] = useState('가방');
   const [preview, setPreview] = useState(null);
 
-  // 이미지 첨부 미리보기 로직
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -48,11 +49,13 @@ const CommunityWrite = () => {
       reader.readAsDataURL(file);
     }
   };
-    const handleMajorChange = (e) => {
-        const newMajor = e.target.value;
-        setMajorCategory(newMajor);
-        setFormData({ ...formData, category_id: CATEGORY_DATA[newMajor][0].id });
-    };
+
+  const handleMajorChange = (e) => {
+      const newMajor = e.target.value;
+      setMajorCategory(newMajor);
+      setFormData({ ...formData, category_id: CATEGORY_DATA[newMajor][0].id });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
@@ -83,96 +86,115 @@ const CommunityWrite = () => {
   };
 
   return (
-    <div className="pc-container" style={{background:'#f8f9fa', minHeight:'100vh'}}>
+    <div className="write-container">
+      {/* ★ 공통 헤더 적용 ★ */}
       <header className="pc-header">
         <div className="header-inner">
-           <button onClick={() => navigate(-1)} style={{display:'flex', alignItems:'center', gap:5, cursor:'pointer', fontWeight:'bold', fontSize: 16, border:'none', background:'none'}}>
-             <ArrowLeft size={24} /> 취소
-           </button>
+          <div className="logo" onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <img src="/logo.jpg" alt="ALAF Logo" style={{ height: '36px', width: 'auto' }} />
+            <h1 className="logo-text">ALAF</h1>
+          </div>
+          <div className="pc-nav-menu">
+             <button className="menu-item" onClick={() => navigate(-1)}>돌아가기</button>
+          </div>
         </div>
       </header>
 
-      <main className="pc-main" style={{ marginTop: 20 }}>
-        <div style={{ maxWidth: 700, margin: '0 auto', background: 'white', padding: 40, borderRadius: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
-          <h2 style={{ marginBottom: 30, fontSize: 24, fontWeight: '800' }}>✏️ 커뮤니티 글쓰기</h2>
+      <main className="write-main">
+        <div className="write-box">
+          <div className="write-header">
+            <h2>커뮤니티 글쓰기</h2>
+          </div>
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <form className="write-form-grid" onSubmit={handleSubmit}>
             
-            <div>
-              <label style={{ display: 'block', marginBottom: 10, fontWeight: 'bold' }}>어떤 글인가요?</label>
-              <div style={{ display: 'flex', gap: 10 }}>
-                <button type="button" onClick={() => setFormData({...formData, post_type: 'LOST'})}
-                  style={{ flex: 1, padding: 15, borderRadius: 12, border: formData.post_type === 'LOST' ? '2px solid #3b82f6' : '1px solid #ddd', background: formData.post_type === 'LOST' ? '#eff6ff' : 'white', fontWeight: 'bold', cursor: 'pointer' }}>
-                  🙌 물건을 주웠어요 (습득)
+            {/* 글 종류 선택 (토글 버튼) */}
+            <div className="form-group">
+              <label>어떤 글인가요?</label>
+              <div className="type-toggle-group">
+                <button 
+                  type="button" 
+                  className={`type-btn ${formData.post_type === 'LOST' ? 'active-lost' : ''}`}
+                  onClick={() => setFormData({...formData, post_type: 'LOST'})}
+                >
+                  물건을 주웠어요 (습득)
                 </button>
-                <button type="button" onClick={() => setFormData({...formData, post_type: 'LOOKING_FOR'})}
-                  style={{ flex: 1, padding: 15, borderRadius: 12, border: formData.post_type === 'LOOKING_FOR' ? '2px solid #e03131' : '1px solid #ddd', background: formData.post_type === 'LOOKING_FOR' ? '#fff5f5' : 'white', fontWeight: 'bold', cursor: 'pointer' }}>
-                  👀 물건을 찾아요 (분실)
+                <button 
+                  type="button" 
+                  className={`type-btn ${formData.post_type === 'LOOKING_FOR' ? 'active-looking' : ''}`}
+                  onClick={() => setFormData({...formData, post_type: 'LOOKING_FOR'})}
+                >
+                  물건을 찾아요 (분실)
                 </button>
               </div>
             </div>
+
             {/* 카테고리 선택 */}
-            <div style={{ display: 'flex', gap: 20, marginBottom: 20 }}>
-                <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', marginBottom: 8, fontWeight: 'bold' }}>대분류</label>
-                    <select 
-                    value={majorCategory} 
-                    onChange={handleMajorChange} 
-                    style={{ width: '100%', padding: 15, borderRadius: 12, border: '1px solid #ddd', cursor: 'pointer', fontSize: 16 }}
-                    >
-                    {Object.keys(CATEGORY_DATA).map(major => (
-                        <option key={major} value={major}>{major}</option>
-                    ))}
+            <div className="form-row">
+                <div className="form-group">
+                    <label>대분류</label>
+                    <select value={majorCategory} onChange={handleMajorChange} className="select-field">
+                      {Object.keys(CATEGORY_DATA).map(major => (
+                          <option key={major} value={major}>{major}</option>
+                      ))}
                     </select>
                 </div>
 
-                <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', marginBottom: 8, fontWeight: 'bold' }}>소분류</label>
+                <div className="form-group">
+                    <label>소분류</label>
                     <select 
-                    value={formData.category_id} 
-                    onChange={(e) => setFormData({ ...formData, category_id: Number(e.target.value) })} 
-                    style={{ width: '100%', padding: 15, borderRadius: 12, border: '1px solid #ddd', cursor: 'pointer', fontSize: 16 }}
+                      value={formData.category_id} 
+                      onChange={(e) => setFormData({ ...formData, category_id: Number(e.target.value) })} 
+                      className="select-field"
                     >
-                    {CATEGORY_DATA[majorCategory].map(sub => (
-                        <option key={sub.id} value={sub.id}>{sub.name}</option>
-                    ))}
+                      {CATEGORY_DATA[majorCategory].map(sub => (
+                          <option key={sub.id} value={sub.id}>{sub.name}</option>
+                      ))}
                     </select>
                 </div>
             </div>
 
             {/* 제목 */}
-            <div>
-              <label style={{ display: 'block', marginBottom: 10, fontWeight: 'bold' }}>제목</label>
-              <input type="text" required placeholder="예: 도서관 3층에서 에어팟 본체 주웠습니다." 
-                value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})}
-                style={{ width: '100%', padding: 15, borderRadius: 12, border: '1px solid #ddd', fontSize: 16 }} />
+            <div className="form-group">
+              <label>제목</label>
+              <input 
+                type="text" required 
+                placeholder="예: 도서관 3층에서 에어팟 본체 주웠습니다." 
+                value={formData.title} 
+                onChange={(e) => setFormData({...formData, title: e.target.value})}
+                className="input-field" 
+              />
             </div>
 
             {/* 내용 */}
-            <div>
-              <label style={{ display: 'block', marginBottom: 10, fontWeight: 'bold' }}>상세 내용</label>
-              <textarea required placeholder="물건의 특징이나 발견한 위치 등을 상세히 적어주세요." 
-                value={formData.content} onChange={(e) => setFormData({...formData, content: e.target.value})}
-                style={{ width: '100%', padding: 15, borderRadius: 12, border: '1px solid #ddd', fontSize: 16, minHeight: 200, resize: 'vertical' }} />
+            <div className="form-group">
+              <label>상세 내용</label>
+              <textarea 
+                required 
+                placeholder="물건의 특징이나 발견한 위치 등을 상세히 적어주세요." 
+                value={formData.content} 
+                onChange={(e) => setFormData({...formData, content: e.target.value})}
+                className="textarea-field" 
+              />
             </div>
 
             {/* 사진 첨부 */}
-            <div>
-              <label style={{ display: 'block', marginBottom: 10, fontWeight: 'bold' }}>사진 첨부 (선택)</label>
-              <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: 150, border: '2px dashed #ccc', borderRadius: 12, cursor: 'pointer', background: '#fafafa' }}>
+            <div className="form-group">
+              <label>사진 첨부 (선택)</label>
+              <label className="image-upload-box">
                 {preview ? (
-                  <img src={preview} alt="미리보기" style={{ height: '100%', objectFit: 'contain' }} />
+                  <img src={preview} alt="미리보기" style={{ height: '100%', objectFit: 'contain', borderRadius: '10px' }} />
                 ) : (
-                  <>
-                    <ImageIcon size={32} color="#aaa" style={{ marginBottom: 10 }} />
-                    <span style={{ color: '#888' }}>클릭하여 사진 업로드</span>
-                  </>
+                  <div className="upload-placeholder">
+                    <ImageIcon size={32} color="#adb5bd" />
+                    <span>클릭하여 사진 업로드</span>
+                  </div>
                 )}
                 <input type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
               </label>
             </div>
 
-            <button type="submit" style={{ width: '100%', padding: 18, marginTop: 20, background: '#3b82f6', color: 'white', borderRadius: 12, fontSize: 18, fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>
+            <button type="submit" className="submit-btn">
               등록하기
             </button>
           </form>

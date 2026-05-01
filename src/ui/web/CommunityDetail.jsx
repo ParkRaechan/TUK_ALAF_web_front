@@ -1,13 +1,14 @@
 import { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { UserContext } from '../../context/UserContext';
-import { ArrowLeft, MessageCircle } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import axios from 'axios';
+import './CommunityDetail.css'; // ★ 전용 CSS 연결
 
 const CommunityDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useContext(UserContext); // 로그인 유저 정보
+  const { user } = useContext(UserContext); 
   const [post, setPost] = useState(null);
 
   useEffect(() => {
@@ -21,84 +22,88 @@ const CommunityDetail = () => {
       }
     };
     fetchDetail();
-  }, [id]);
+  }, [id, navigate]);
 
-  if (!post) return <div style={{padding:50, textAlign:'center'}}>데이터 불러오는 중...</div>;
+  if (!post) return <div className="comm-detail-loading">데이터 불러오는 중...</div>;
 
-  // 내 글인지 확인
   const isMyPost = user && user.id === post.member_id;
 
   return (
-    <div className="pc-container" style={{paddingBottom: 50, background:'#f8f9fa', minHeight:'100vh'}}>
+    <div className="comm-detail-container">
+      
+      {/* ★ 공통 헤더 + 로고 가로 정렬 ★ */}
       <header className="pc-header">
         <div className="header-inner">
-           <button onClick={() => navigate(-1)} style={{display:'flex', alignItems:'center', gap:5, cursor:'pointer', fontWeight:'bold', fontSize: 16, border:'none', background:'none'}}>
-             <ArrowLeft size={24} /> 뒤로가기
-           </button>
+          <div className="logo" onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <img src="/logo.jpg" alt="ALAF Logo" style={{ height: '36px', width: 'auto' }} />
+            <h1 className="logo-text">ALAF</h1>
+          </div>
+          <div className="pc-nav-menu">
+             <button className="menu-item" onClick={() => navigate(-1)}>돌아가기</button>
+          </div>
         </div>
       </header>
 
-      <main className="pc-main" style={{ marginTop: 20 }}>
-        <div style={{ maxWidth: 800, margin: '0 auto', background: 'white', padding: 50, borderRadius: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+      <main className="comm-detail-main">
+        <div className="comm-detail-card">
           
-            <div style={{ marginBottom: 20, display: 'flex', gap: 10, alignItems: 'center' }}>
-                <span style={{background: post.post_type === 'LOST' ? '#e6fcf5' : '#fff5f5', color: post.post_type === 'LOST' ? '#0ca678' : '#fa5252', padding:'6px 12px', borderRadius:20, fontSize:13, fontWeight:'bold'}}>
-                    {post.post_type === 'LOST' ? '🙌 습득했어요 (보관중)' : '👀 찾고있어요 (분실함)'}
-                </span>
-                {/* 카테고리 표시 뱃지 */}
-                <span style={{background:'#f1f3f5', color:'#495057', padding:'6px 12px', borderRadius:20, fontSize:13, fontWeight:'600'}}>
-                    📂 {post.category_name}
-                </span>
-            </div>
+          {/* 상단 뱃지 영역 (이모티콘 제거) */}
+          <div className="detail-badges">
+              <span className={`badge-type ${post.post_type === 'LOST' ? 'lost' : 'looking'}`}>
+                  {post.post_type === 'LOST' ? '습득했어요 (보관중)' : '찾고있어요 (분실함)'}
+              </span>
+              <span className="badge-category">
+                  {post.category_name}
+              </span>
+          </div>
 
-          <h1 style={{ fontSize: 32, fontWeight: '800', marginBottom: 15 }}>{post.title}</h1>
+          <h1 className="detail-title">{post.title}</h1>
           
-          <div style={{ display: 'flex', justifyContent: 'space-between', color: '#868e96', borderBottom: '1px solid #eee', paddingBottom: 20, marginBottom: 20 }}>
-            <span>작성자: <strong style={{color:'#333'}}>{post.author_name}</strong></span>
+          <div className="detail-meta">
+            <span>작성자: <strong>{post.author_name}</strong></span>
             <span>{new Date(post.created_at).toLocaleString()}</span>
           </div>
 
           {/* 이미지 영역 */}
           {post.images && post.images.length > 0 && (
-            <div style={{ marginBottom: 30, textAlign: 'center', background:'#fafafa', borderRadius: 12, padding:10 }}>
+            <div className="detail-image-box">
                 <img 
-                src={`http://49.50.138.248:8080${post.images[0]}`} 
-                alt="게시글 첨부" 
-                style={{ 
-                    maxWidth: '100%', 
-                    maxHeight: '500px', 
-                    objectFit: 'contain',
-                    borderRadius: 12 
-                }} />
+                  src={`http://49.50.138.248:8080${post.images[0]}`} 
+                  alt="게시글 첨부" 
+                />
             </div>
-            )}
+          )}
 
           {/* 본문 내용 */}
-          <div style={{ fontSize: 16, lineHeight: 1.8, color: '#333', minHeight: 150, whiteSpace: 'pre-wrap' }}>
+          <div className="detail-content">
             {post.content}
           </div>
 
-          <div style={{height:1, background:'#eee', margin:'40px 0 30px'}}></div>
+          <div className="detail-divider"></div>
 
           {/* 액션 버튼 영역 */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 15 }}>
+          <div className="detail-actions">
             {isMyPost ? (
-              <button style={{ padding: '15px 40px', borderRadius: 12, border: '1px solid #ddd', background: 'white', fontWeight: 'bold', cursor: 'pointer' }}>
+              <button className="edit-btn">
                 글 수정/삭제 (준비중)
               </button>
             ) : (
               <button 
-                onClick={() => alert("채팅 기능은 향후 업데이트 예정입니다! 기대해주세요 😉")}
-                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '15px 50px', borderRadius: 12, border: 'none', background: '#3b82f6', color: 'white', fontSize: 18, fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(59,130,246,0.3)' }}
+                className="chat-btn"
+                onClick={() => alert("채팅 기능은 향후 업데이트 예정입니다! 기대해주세요.")}
               >
-                <MessageCircle size={24} />
-                작성자에게 1:1 채팅 보내기
+                <MessageCircle size={20} />
+                <span>작성자에게 1:1 채팅 보내기</span>
               </button>
             )}
           </div>
 
         </div>
       </main>
+      
+      <footer className="pc-footer">
+        <p>© 2026 ALAF Team. All rights reserved.</p>
+      </footer>
     </div>
   );
 };
