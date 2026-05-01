@@ -11,7 +11,7 @@ import WebMyPage from './ui/web/WebMyPage';
 import WebSignup from './ui/web/WebSignup';
 import WebTerms from './ui/web/WebTerms';
 import WebLogin from './ui/web/WebLogin';
-import ChatRoom from './ui/web/ChatRoom';
+
 /*
 // (2) 키오스크(Raspberry Pi)용 페이지
 import KioskHome from './ui/kiosk/KioskHome';
@@ -30,6 +30,8 @@ import AdminRequests from './ui/web/AdminRequests';
 import CommunityHome from './ui/web/CommunityHome';
 import CommunityDetail from './ui/web/CommunityDetail';
 import CommunityWrite from './ui/web/CommunityWrite';
+import ChatRoom from './ui/web/ChatRoom';
+import ChatRoomList from './ui/web/ChatRoomList';
 // -----------------------------------------------------------
 // [2] Context (데이터 공급소) 불러오기
 // -----------------------------------------------------------
