@@ -5,6 +5,7 @@ import io from 'socket.io-client';
 import axios from 'axios';
 import { UserContext } from '../../context/UserContext';
 import { ArrowLeft, Send } from 'lucide-react';
+import './ChatRoom.css';
 
 // 서버 주소에 맞게 소켓 연결
 const socket = io('http://49.50.138.248:8080');
@@ -64,7 +65,7 @@ const ChatRoom = () => {
 
     const messageData = {
       roomId,
-      senderId: user.member_id,
+      sender_id: user.id,
       sender_name: user.name, // 화면 표시용
       message: inputMessage,
       created_at: new Date().toISOString(),
@@ -100,7 +101,7 @@ const ChatRoom = () => {
       {/* 대화창 */}
       <div className="chat-messages" style={{ flex: 1, overflowY: 'auto', padding: '15px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {messages.map((msg, idx) => {
-          const isMyMessage = msg.sender_id === user?.member_id;
+          const isMyMessage = msg.sender_id === user?.id;
           return (
             <div key={idx} style={{ alignSelf: isMyMessage ? 'flex-end' : 'flex-start', maxWidth: '70%' }}>
               {!isMyMessage && <div style={{ fontSize: '12px', marginBottom: '4px', color: '#666' }}>{msg.sender_name}</div>}

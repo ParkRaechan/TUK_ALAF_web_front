@@ -1,0 +1,27 @@
+.message-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  max-width: 70%;
+}
+
+/* 내가 보낸 메시지 (오른쪽 정렬, 초록색) */
+.message-wrapper.mine {
+  align-self: flex-end; /* 오른쪽으로 밀기 */
+  align-items: flex-end;
+}
+.message-wrapper.mine .message-bubble {
+  background-color: #dcf8c6; /* 카톡 초록색 느낌 */
+  border-radius: 12px 0 12px 12px;
+}
+
+/* 상대방이 보낸 메시지 (왼쪽 정렬, 하얀색/회색) */
+.message-wrapper.partner {
+  align-self: flex-start; /* 왼쪽으로 밀기 */
+  align-items: flex-start;
+}
+.message-wrapper.partner .message-bubble {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 0 12px 12px 12px;
+}
