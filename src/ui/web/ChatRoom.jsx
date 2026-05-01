@@ -5,7 +5,6 @@ import io from 'socket.io-client';
 import axios from 'axios';
 import { UserContext } from '../../context/UserContext';
 import { ArrowLeft, Send } from 'lucide-react';
-import './ChatRoom.css'; // 디자인용 CSS (별도 생성 필요)
 
 // 서버 주소에 맞게 소켓 연결
 const socket = io('http://49.50.138.248:8080');
