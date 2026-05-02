@@ -142,3 +142,26 @@
   font-family: inherit;
 }
 .back-btn:hover { color: #888; }
+
+.pc-banner-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 30px 30px 0; /* 배너 위쪽, 양옆 여백 */
+  background-color: #ffffff;
+}
+
+.banner-inner {
+  width: 100%;
+  max-width: 1400px; /* 기존 레이아웃 가이드라인과 동일하게 맞춤 */
+  border-radius: 16px; /* 이미지 모서리 둥글게 */
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); /* 은은한 그림자 */
+}
+
+.banner-inner img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}

@@ -121,6 +121,16 @@ const WebHome = () => {
         </div>
       </header>
 
+      {/* ==========================================
+          광고 배너 영역 
+         ========================================== */}
+      <div className="pc-banner-section">
+        <div className="banner-inner">
+          <img src="/TUK_ALAF광고.png" alt="ALAF 스마트 분실물 키오스크" />
+        </div>
+      </div>
+      {/* ========================================== */}
+
       <div className="pc-layout">
         
         <aside className="pc-sidebar">
